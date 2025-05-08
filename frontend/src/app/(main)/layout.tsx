@@ -71,8 +71,8 @@ export default function MainLayout({
       <Sidebar collapsible="icon">
         <SidebarHeader>
           {/* Mobile only trigger is handled inside Header component now */}
-          <div className="hidden md:flex items-center justify-between"> {/* Hide Logo on mobile sidebar header, show it in main Header */}
-             <Logo textSize="text-lg" />
+          <div className="hidden md:flex items-center justify-start pl-2"> {/* Align to start and add padding */}
+             <Logo iconSize={28} /> {/* Adjusted icon size for sidebar */}
           </div>
         </SidebarHeader>
         <SidebarContent>

@@ -41,7 +41,7 @@ export function Header() {
           <div className="md:hidden"> {/* Show sidebar trigger only on mobile */}
             <SidebarTrigger />
           </div>
-          <Logo />
+          <Logo iconSize={32} /> {/* Using new Logo component */}
         </div>
         
         <div className="flex items-center gap-4">

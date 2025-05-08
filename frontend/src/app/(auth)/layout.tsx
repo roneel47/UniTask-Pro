@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { Logo } from "@/components/common/logo";
-import Image from "next/image";
 import { ThemeToggleButton } from "@/components/layout/theme-toggle-button";
 
 export default function AuthLayout({
@@ -38,7 +37,7 @@ export default function AuthLayout({
         <Card className="shadow-xl">
           <CardHeader className="space-y-1 text-center">
             <div className="mx-auto mb-6">
-              <Logo iconSize={40} textSize="text-3xl" />
+              <Logo iconSize={48} /> {/* Adjusted icon size for prominence */}
             </div>
             {children}
           </CardHeader>
@@ -50,4 +49,3 @@ export default function AuthLayout({
 
 // Shadcn UI components needed for this layout
 import { Card, CardHeader } from "@/components/ui/card";
-
