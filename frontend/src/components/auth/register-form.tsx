@@ -23,20 +23,21 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
 import type { UserRole, Semester } from "@/types";
-import { USER_ROLES_OPTIONS, SEMESTERS } from "@/types";
+import { USER_ROLES_OPTIONS, SEMESTERS } from "@/types"; // USER_ROLES_OPTIONS might not be needed if role is fixed
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
+// Updated schema: Role is fixed to "student"
 const registerFormSchema = z.object({
   usn: z.string().min(1, "USN is required").max(50, "USN too long"),
   name: z.string().min(1, "Name is required").max(100, "Name too long"),
   password: z.string().min(6, "Password must be at least 6 characters").max(50, "Password too long"),
-  role: z.enum(USER_ROLES_OPTIONS).refine(val => val !== 'master-admin', {message: "Cannot register as Master Admin"}),
+  role: z.literal("student" as UserRole), // Role is fixed to "student"
   semester: z.enum(SEMESTERS),
-}).refine(data => data.role === 'student' ? data.semester !== 'N/A' : data.semester === 'N/A', {
-  message: "Students must have a semester (1-8). Admins must have semester 'N/A'.",
-  path: ["semester"], // This error will be shown under the semester field
+}).refine(data => data.role === 'student' ? data.semester !== 'N/A' : data.semester === 'N/A', { // This refine will effectively mean semester !== 'N/A'
+  message: "Students must have a semester (1-8). Admins must have semester 'N/A'.", // Message can remain, or be simplified
+  path: ["semester"],
 });
 
 
@@ -52,20 +53,22 @@ export function RegisterForm() {
       usn: "",
       name: "",
       password: "",
-      role: "student",
-      semester: "1",
+      role: "student", // Default role is student
+      semester: "1",   // Default semester for student
     },
   });
 
-  const currentRole = form.watch("role");
+  // currentRole will always be "student" because the field is removed and default is "student"
+  const currentRole = form.watch("role"); 
 
   async function onSubmit(values: RegisterFormValues) {
+    // values.role will be "student" due to defaultValues and schema
     await register({
       usn: values.usn,
       name: values.name,
       password: values.password,
-      role: values.role as UserRole,
-      semester: values.semester as Semester,
+      role: values.role, // No need for `as UserRole` if schema ensures it's "student" & matches
+      semester: values.semester,
     });
   }
 
@@ -126,40 +129,7 @@ export function RegisterForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Role</FormLabel>
-              <Select 
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  if (value === 'student') {
-                    form.setValue('semester', '1');
-                  } else {
-                    form.setValue('semester', 'N/A');
-                  }
-                }} 
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your role" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {USER_ROLES_OPTIONS.filter(role => role !== 'master-admin').map((role) => (
-                    <SelectItem key={role} value={role} className="capitalize">
-                      {role.charAt(0).toUpperCase() + role.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Role field removed - defaults to student */}
         <FormField
           control={form.control}
           name="semester"
@@ -169,7 +139,7 @@ export function RegisterForm() {
               <Select 
                 onValueChange={field.onChange} 
                 defaultValue={field.value}
-                disabled={currentRole === "admin"}
+                // disabled={currentRole === "admin"} // currentRole will be "student", so this is effectively disabled={false}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -181,7 +151,8 @@ export function RegisterForm() {
                     <SelectItem 
                       key={sem} 
                       value={sem}
-                      disabled={currentRole === 'admin' && sem !== 'N/A' || currentRole === 'student' && sem === 'N/A'}
+                      // currentRole is "student", so this simplifies to disabled={sem === 'N/A'}
+                      disabled={sem === 'N/A'} 
                     >
                       {sem}
                     </SelectItem>
@@ -189,7 +160,7 @@ export function RegisterForm() {
                 </SelectContent>
               </Select>
               <FormDescription>
-                {currentRole === 'student' ? "Select your current semester." : "Semester is N/A for admins."}
+                Select your current semester.
               </FormDescription>
               <FormMessage />
             </FormItem>
