@@ -1,3 +1,6 @@
+// Frontend types should ideally mirror backend responses.
+// If backend sends _id and a separate id field (e.g. USN for User.id), reflect that.
+
 export type UserRole = "student" | "admin" | "master-admin";
 
 export type TaskStatus =
@@ -8,40 +11,44 @@ export type TaskStatus =
   | "Done";
 
 export interface User {
-  id: string; // USN
+  _id?: string; // MongoDB ObjectId as string
+  id: string;    // This is the USN, used as the primary key in frontend logic/components
   usn: string;
-  password?: string; // Store hashed in a real app
+  password?: string; // Not typically sent to frontend
   role: UserRole;
-  semester: string; // '1'-'8' for students, 'N/A' for admins not tied to a semester
-  name?: string; // Optional: full name
+  semester: string; 
+  name?: string; 
+  createdAt?: string; 
+  updatedAt?: string;
 }
 
 export interface Task {
-  id: string;
+  _id: string; // MongoDB ObjectId as string, now the primary unique ID for a task
+  id: string; // This should be the same as _id for tasks, for consistency in dnd draggableId
   title: string;
   description: string;
   dueDate: string; // ISO string format
   status: TaskStatus;
-  assignedToUsn: string | "all"; // Specific USN or 'all' for semester-wide
-  assignedToSemester: string; // Semester '1'-'8' or 'N/A'
-  assigningAdminUsn: string; // USN of the admin who created the task
-  submissionFile?: string; // Path or name of the submitted file
-  createdAt: string; // ISO string format
-  updatedAt: string; // ISO string format
-  taskAssignmentMetaId?: string; // Link to the TaskAssignmentMeta
+  assignedToUsn: string; 
+  assignedToSemester: string; 
+  assigningAdminUsn: string; 
+  submissionFile?: string; 
+  taskAssignmentMetaId: string; // ObjectId as string
+  createdAt: string; 
+  updatedAt: string; 
 }
 
-// Represents a unique task assignment created by an admin
-// Used for the "My Assignments" page for admins
 export interface TaskAssignmentMeta {
-  id: string; // Unique ID for this assignment instance (e.g., combination of admin USN + task title + timestamp)
+  _id: string; // MongoDB ObjectId as string
+  id: string;  // This should be the same as _id for meta items
   title: string;
   description: string;
-  dueDate: string;
+  dueDate: string; // ISO string
   assignedToSemester: string;
-  assignedToTarget: string; // "all" or specific USN
+  assignedToTarget: string; 
   assigningAdminUsn: string;
-  createdAt: string;
+  createdAt: string; 
+  updatedAt?: string;
 }
 
 export const TASK_STATUS_COLUMNS: TaskStatus[] = [

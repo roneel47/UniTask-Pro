@@ -46,9 +46,9 @@ const KanbanBoard: React.FC = () => {
 
     userTasks.forEach(task => {
       if (initialColumns[task.status]) {
-        initialColumns[task.status].tasks.push(task);
+        initialColumns[task.status].tasks.push({ ...task, id: task._id }); // Ensure task.id is task._id for dnd
       } else {
-        initialColumns["To Be Started"].tasks.push(task);
+        initialColumns["To Be Started"].tasks.push({ ...task, id: task._id });
       }
     });
     
@@ -61,7 +61,7 @@ const KanbanBoard: React.FC = () => {
   }, [currentUser, allTasks, authIsLoading, dataIsLoading, getTasksForCurrentUser]);
 
   const onDragEnd = async (result: DropResult) => {
-    const { source, destination, draggableId } = result;
+    const { source, destination, draggableId } = result; // draggableId is task._id
 
     if (!destination) return;
 
@@ -71,7 +71,9 @@ const KanbanBoard: React.FC = () => {
 
     const startColumn = columns[source.droppableId];
     const finishColumn = columns[destination.droppableId];
-    const task = startColumn.tasks.find(t => t.id === draggableId);
+    // Find task by _id (which is draggableId)
+    const task = startColumn.tasks.find(t => t._id === draggableId);
+
 
     if (!task) return;
 
@@ -101,9 +103,9 @@ const KanbanBoard: React.FC = () => {
     };
     setColumns(newColumnsState);
     
-    // Call API to update task status
+    // Call API to update task status using task._id
     try {
-      await updateTaskStatus(draggableId, finishColumn.id as TaskStatus);
+      await updateTaskStatus(draggableId, finishColumn.id as TaskStatus); // draggableId is task._id
     } catch (error) {
       // Revert UI if API call fails
       setColumns(columns); 

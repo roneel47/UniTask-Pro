@@ -21,7 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function ManageUsersPage() {
   const { currentUser } = useAuth();
   const router = useRouter();
-  const { users, updateUser, deleteUser, getUsersByFilter, isLoading: dataIsLoading, fetchUsers } = useData(); // Added fetchUsers
+  const { users, updateUser, deleteUser, getUsersByFilter, isLoading: dataIsLoading, fetchUsers } = useData();
 
   const [filters, setFilters] = useState<{ role?: UserRole, semester?: Semester, usnSearch?: string }>({});
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
@@ -33,7 +33,7 @@ export default function ManageUsersPage() {
       router.push("/dashboard");
       toast({ title: "Access Denied", description: "You do not have permission to view this page.", variant: "destructive" });
     } else {
-      fetchUsers(); // Fetch users when page loads for master admin
+      fetchUsers(); 
     }
   }, [currentUser, router, fetchUsers]);
 
@@ -58,7 +58,7 @@ export default function ManageUsersPage() {
         return;
     }
 
-    await updateUser(editingUser.id, updatedFields);
+    await updateUser(editingUser.id, updatedFields); // Use user.id (which is USN)
     setIsEditModalOpen(false);
     setEditingUser(null);
   };
@@ -69,7 +69,7 @@ export default function ManageUsersPage() {
       return;
     }
     const nextSemester = (parseInt(user.semester, 10) + 1).toString() as Semester;
-    await updateUser(user.id, { semester: nextSemester });
+    await updateUser(user.id, { semester: nextSemester }); // Use user.id (USN)
     toast({ title: "Promotion Successful", description: `${user.usn} promoted to semester ${nextSemester}.` });
   };
 
@@ -78,7 +78,7 @@ export default function ManageUsersPage() {
       toast({ title: "Error", description: "Can only remove semester from non-Master Admins.", variant: "destructive"});
       return;
     }
-    await updateUser(user.id, { semester: 'N/A' });
+    await updateUser(user.id, { semester: 'N/A' }); // Use user.id (USN)
     toast({ title: "Admin Updated", description: `Semester association removed for ${user.usn}.` });
   };
 
@@ -86,7 +86,7 @@ export default function ManageUsersPage() {
     return null; 
   }
   
-  if (dataIsLoading) {
+  if (dataIsLoading && users.length === 0) { // Show skeleton if loading and no users yet
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
@@ -127,14 +127,14 @@ export default function ManageUsersPage() {
           onChange={(e) => handleFilterChange('usnSearch', e.target.value)} 
           className="bg-background"
         />
-        <Select onValueChange={(value) => handleFilterChange('role', value)}>
+        <Select onValueChange={(value) => handleFilterChange('role', value as UserRole | undefined)}>
           <SelectTrigger><SelectValue placeholder="Filter by Role" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Roles</SelectItem>
             {USER_ROLES_OPTIONS.map(role => <SelectItem key={role} value={role} className="capitalize">{role}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select onValueChange={(value) => handleFilterChange('semester', value)}>
+        <Select onValueChange={(value) => handleFilterChange('semester', value as Semester | undefined)}>
           <SelectTrigger><SelectValue placeholder="Filter by Semester" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Semesters</SelectItem>
@@ -156,7 +156,7 @@ export default function ManageUsersPage() {
           </TableHeader>
           <TableBody>
             {filteredUsers.length > 0 ? filteredUsers.map(user => (
-              <TableRow key={user.id}>
+              <TableRow key={user.id}> {/* user.id is USN */}
                 <TableCell className="font-medium">{user.usn}</TableCell>
                 <TableCell>{user.name || '-'}</TableCell>
                 <TableCell className="capitalize">{user.role}</TableCell>
@@ -320,7 +320,7 @@ function EditUserForm({ user, onSave, onCancel, currentUser }: EditUserFormProps
           </SelectTrigger>
           <SelectContent>
             {SEMESTERS.map(s => (
-              <SelectItem key={s} value={s} disabled={role !== 'student' && s !== 'N/A' || role === 'student' && s === 'N/A'}>{s}</SelectItem>
+              <SelectItem key={s} value={s} disabled={(role !== 'student' && s !== 'N/A') || (role === 'student' && s === 'N/A')}>{s}</SelectItem>
             ))}
           </SelectContent>
         </Select>

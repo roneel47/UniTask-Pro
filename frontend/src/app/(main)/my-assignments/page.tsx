@@ -16,29 +16,36 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function MyAssignmentsPage() {
   const { currentUser } = useAuth();
   const router = useRouter();
-  const { taskAssignmentsMeta, deleteTaskAssignmentMetaAndTasks, isLoading: dataIsLoading, fetchTaskAssignmentsMeta } = useData(); // Added fetchTaskAssignmentsMeta
+  const { taskAssignmentsMeta, deleteTaskAssignmentMetaAndTasks, isLoading: dataIsLoading, fetchTaskAssignmentsMeta } = useData(); 
   const [myAssignments, setMyAssignments] = useState<TaskAssignmentMeta[]>([]);
 
   useEffect(() => {
     if (currentUser && (currentUser.role === "student" || currentUser.role === 'master-admin')) {
       toast({ title: "Access Denied", description: "This page is for Admins to view their created assignments.", variant: "destructive"});
       router.push("/dashboard");
-    } else if (currentUser) {
-        fetchTaskAssignmentsMeta(); // Fetch assignments when page loads for admin
+    } else if (currentUser && currentUser.role === 'admin') { // Check for admin role specifically
+        fetchTaskAssignmentsMeta(); 
     }
   }, [currentUser, router, fetchTaskAssignmentsMeta]);
 
   useEffect(() => {
     if (currentUser) {
-      setMyAssignments(taskAssignmentsMeta.filter(meta => meta.assigningAdminUsn === currentUser.usn));
+      // Filter based on assigningAdminUsn and ensure each meta object has _id as id for key prop
+      setMyAssignments(
+        taskAssignmentsMeta
+          .filter(meta => meta.assigningAdminUsn === currentUser.usn)
+          .map(meta => ({ ...meta, id: meta._id })) // Ensure `id` prop for key is `_id`
+      );
     }
   }, [taskAssignmentsMeta, currentUser]);
 
-  if (!currentUser || currentUser.role === "student") {
+  if (!currentUser || currentUser.role === "student" || currentUser.role === "master-admin") {
+    // Master admin could potentially have a different view or create tasks differently
+    // For now, restrict to 'admin'
     return null; 
   }
   
-  if (dataIsLoading) {
+  if (dataIsLoading && myAssignments.length === 0) { // Show skeleton if loading and no assignments yet
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold tracking-tight">My Task Assignments</h1>
@@ -80,11 +87,11 @@ export default function MyAssignmentsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {myAssignments.sort((a,b) => parseISO(b.createdAt).getTime() - parseISO(a.createdAt).getTime()).map(meta => (
-            <Card key={meta.id} className="flex flex-col">
+            <Card key={meta._id} className="flex flex-col"> {/* Use meta._id for key */}
               <CardHeader>
                 <CardTitle className="text-xl">{meta.title}</CardTitle>
                 <CardDescription>
-                  Created on: {format(parseISO(meta.createdAt), "MMM d, yyyy HH:mm")}
+                  Created on: {format(parseISO(meta.createdAt as string), "MMM d, yyyy HH:mm")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2 flex-grow">
@@ -92,7 +99,7 @@ export default function MyAssignmentsPage() {
                 <div className="text-xs text-muted-foreground space-y-1">
                     <p className="flex items-center"><Users className="w-3.5 h-3.5 mr-1.5"/> Semester: {meta.assignedToSemester}</p>
                     <p className="flex items-center"><User className="w-3.5 h-3.5 mr-1.5"/> Target: {meta.assignedToTarget === 'all' ? 'All Students' : meta.assignedToTarget}</p>
-                    <p>Due: {format(parseISO(meta.dueDate), "MMM d, yyyy")}</p>
+                    <p>Due: {format(parseISO(meta.dueDate as string), "MMM d, yyyy")}</p>
                 </div>
               </CardContent>
               <CardFooter>
@@ -111,7 +118,7 @@ export default function MyAssignmentsPage() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deleteTaskAssignmentMetaAndTasks(meta.id)} className="bg-destructive hover:bg-destructive/90">
+                      <AlertDialogAction onClick={() => deleteTaskAssignmentMetaAndTasks(meta._id)} className="bg-destructive hover:bg-destructive/90">
                         Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>

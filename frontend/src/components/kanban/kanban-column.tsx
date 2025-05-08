@@ -38,7 +38,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, tasks }) => {
               )}
             >
               {tasks.map((task, index) => (
-                <Draggable key={task.id} draggableId={task.id} index={index}>
+                <Draggable key={task._id} draggableId={task._id} index={index}>
                   {(providedDraggable, snapshotDraggable) => ( // Renamed to avoid conflict
                     <div
                       ref={providedDraggable.innerRef}

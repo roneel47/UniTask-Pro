@@ -14,7 +14,7 @@ interface AuthContextType {
   login: (usn: string, password?: string) => Promise<boolean>;
   register: (userData: Omit<User, 'id'>) => Promise<boolean>;
   logout: () => void;
-  updateCurrentUser: (updatedUser: User) => void; // For local updates if needed
+  updateCurrentUser: (updatedUser: User) => void; // For local updates if needed by profile page, etc.
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,7 +29,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedUserJson) {
       try {
         const storedUser = JSON.parse(storedUserJson) as User;
-        // Optionally, you could add a call here to validate the session with the backend
+        // Optionally: Validate session with a quick backend check here
+        // e.g., fetch('/api/auth/validate-session').then(res => if (!res.ok) logout());
         setCurrentUser(storedUser);
       } catch (error) {
         console.error("Failed to parse stored user:", error);
@@ -101,8 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateCurrentUser = (updatedUser: User) => {
     // This is primarily for optimistic UI updates or client-side profile changes.
-    // For changes like role/semester that are managed by master-admin,
-    // the DataContext will handle fetching the updated user list.
+    // Backend is the source of truth. Any critical update should refetch or be pushed.
     setCurrentUser(updatedUser);
     sessionStorage.setItem('currentUser', JSON.stringify(updatedUser));
   };
@@ -122,6 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+// useAuth hook remains the same
 export const useAuth = () => {
   const context = React.useContext(AuthContext);
   if (context === undefined) {

@@ -23,12 +23,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const { currentUser } = useAuth();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dueDateColor, setDueDateColor] = useState<'red' | 'yellow' | 'white'>('white');
+  const [dueDateColor, setDueDateColor] useState<'red' | 'yellow' | 'white'>('white');
   const [parsedDueDate, setParsedDueDate] = useState<Date | null>(null);
 
   useEffect(() => {
     try {
-        const date = parseISO(task.dueDate);
+        const date = parseISO(task.dueDate as string); // Ensure dueDate is string for parseISO
         setParsedDueDate(date);
         const now = new Date();
         const hoursLeft = differenceInHours(date, now);
@@ -63,8 +63,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
       return;
     }
     // Simulate file upload for now, in a real app this would be an API call
-    await updateTask(task.id, { submissionFile: selectedFile.name }); 
-    await updateTaskStatus(task.id, "Submitted");
+    await updateTask(task._id, { submissionFile: selectedFile.name }); 
+    await updateTaskStatus(task._id, "Submitted");
     toast({ title: "File Uploaded", description: `${selectedFile.name} submitted for task "${task.title}".` });
     setSelectedFile(null);
     setIsDialogOpen(false);
