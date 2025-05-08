@@ -1,9 +1,11 @@
+
 "use client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { Logo } from "@/components/common/logo";
 import Image from "next/image";
+import { ThemeToggleButton } from "@/components/layout/theme-toggle-button";
 
 export default function AuthLayout({
   children,
@@ -28,7 +30,10 @@ export default function AuthLayout({
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-secondary p-4">
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggleButton />
+      </div>
       <div className="w-full max-w-md">
         <Card className="shadow-xl">
           <CardHeader className="space-y-1 text-center">
@@ -45,3 +50,4 @@ export default function AuthLayout({
 
 // Shadcn UI components needed for this layout
 import { Card, CardHeader } from "@/components/ui/card";
+
