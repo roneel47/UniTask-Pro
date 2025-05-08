@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Header } from "@/components/layout/header";
@@ -131,11 +132,14 @@ export default function MainLayout({
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset>
+      <SidebarInset className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-background">
           {children}
         </main>
+        <footer className="w-full py-4 text-center text-sm text-muted-foreground border-t">
+          © 2025 Roneel V — Built with <span role="img" aria-label="laptop">💻</span> & <span role="img" aria-label="heart">❤️</span> for students, by a student.
+        </footer>
       </SidebarInset>
     </SidebarProvider>
   );
