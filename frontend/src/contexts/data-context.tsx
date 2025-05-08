@@ -52,7 +52,7 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { currentUser, updateCurrentUser: updateAuthCurrentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
-  const [tasks, setTasks] useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [taskAssignmentsMeta, setTaskAssignmentsMeta] = useState<TaskAssignmentMeta[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -137,7 +137,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
 
     if (updatedTask) {
-      setTasks(prevTasks => prevTasks.map(t => (t.id === taskId ? updatedTask : t)));
+      setTasks(prevTasks => prevTasks.map(t => (t._id === taskId ? updatedTask : t))); // Match on _id
       toast({ title: "Task Updated", description: `Task "${updatedTask.title}" updated.` });
     }
     return updatedTask;
@@ -153,7 +153,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     });
     if (success) {
-      setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
+      setTasks(prevTasks => prevTasks.filter(t => t._id !== taskId)); // Match on _id
       toast({ title: "Task Deleted" });
       return true;
     }
@@ -162,12 +162,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteUser = async (userId: string): Promise<boolean> => {
     const success = await fetchWithLoading(async () => {
-      await fetchApi<void>(`/users/${userId}`, { method: 'DELETE' });
+      await fetchApi<void>(`/users/${userId}`, { method: 'DELETE' }); // userId here is USN
       return true;
     });
 
     if (success) {
-      setUsers(prevUsers => prevUsers.filter(u => u.id !== userId));
+      setUsers(prevUsers => prevUsers.filter(u => u.id !== userId)); // userId here is USN
       await fetchTasks(); // Refresh tasks if user's tasks were deleted
       toast({ title: "User Deleted" });
       return true;
@@ -176,14 +176,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateUser = async (userId: string, updates: Partial<User>): Promise<User | null> => {
-    const updatedUser = await fetchWithLoading(() => fetchApi<User>(`/users/${userId}`, {
+    const updatedUser = await fetchWithLoading(() => fetchApi<User>(`/users/${userId}`, { // userId here is USN
       method: 'PATCH',
       body: JSON.stringify(updates),
     }));
 
     if (updatedUser) {
-      setUsers(prevUsers => prevUsers.map(u => (u.id === userId ? updatedUser : u)));
-      if (currentUser?.id === userId) {
+      setUsers(prevUsers => prevUsers.map(u => (u.id === userId ? updatedUser : u))); // userId here is USN
+      if (currentUser?.id === userId) { // userId here is USN
         updateAuthCurrentUser(updatedUser); 
       }
       toast({ title: "User Updated", description: `User ${updatedUser.usn} updated.` });
@@ -198,7 +198,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (success) {
-      setTaskAssignmentsMeta(prev => prev.filter(m => m.id !== metaId));
+      setTaskAssignmentsMeta(prev => prev.filter(m => m._id !== metaId)); // Match on _id
       await fetchTasks(); // Refresh tasks as associated tasks are deleted on backend
       toast({ title: "Assignment Deleted", description: `Assignment and its tasks removed.`});
       return true;
