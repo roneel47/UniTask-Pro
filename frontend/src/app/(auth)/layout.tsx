@@ -1,10 +1,8 @@
-
 "use client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { Logo } from "@/components/common/logo";
-import { ThemeToggleButton } from "@/components/layout/theme-toggle-button";
 
 export default function AuthLayout({
   children,
@@ -29,23 +27,17 @@ export default function AuthLayout({
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-secondary p-4">
-      <div className="absolute top-4 right-4 z-50">
-        <ThemeToggleButton />
-      </div>
-      <div className="w-full max-w-md flex-grow flex items-center justify-center">
-        <Card className="shadow-xl w-full">
+    <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
+      <div className="w-full max-w-md">
+        <Card className="shadow-xl">
           <CardHeader className="space-y-1 text-center">
             <div className="mx-auto mb-6">
-              <Logo iconSize={48} /> {/* Adjusted icon size for prominence */}
+              <Logo iconSize={40} />
             </div>
             {children}
           </CardHeader>
         </Card>
       </div>
-      <footer className="w-full py-4 text-center text-sm text-muted-foreground">
-        © 2025 Roneel V — Built with <span role="img" aria-label="laptop">💻</span> & <span role="img" aria-label="heart">❤️</span> for students, by a student.
-      </footer>
     </div>
   );
 }

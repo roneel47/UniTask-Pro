@@ -18,13 +18,14 @@ This project has been restructured into a separate frontend (Next.js) and backen
     This command will install dependencies for both the `frontend` and `backend` workspaces defined in the root `package.json`, as well as any root-level development tools (like `concurrently`).
 
 2.  **Environment Variables:**
-    -   **Backend:** Navigate to the `backend` directory (`cd backend`). Create a `.env` file. You can copy `backend/.env.example` if it exists, or follow instructions in `backend/README.md`. A typical backend `.env` might look like:
+    -   **Backend:** Create a `.env` file in the `backend` directory (`cd backend`). Refer to `backend/README.md` for the required variables, or use the example below. A typical backend `backend/.env` file should look like:
         ```
         PORT=3001
-        # GOOGLE_API_KEY=your_google_api_key_for_genkit 
+        MONGODB_URI=your_mongodb_connection_string # e.g., mongodb://localhost:27017/unitaskpro
+        # GOOGLE_API_KEY=your_google_api_key_for_genkit (if using Genkit features)
         # Add other environment variables as needed
         ```
-    -   **Frontend:** Navigate to the `frontend` directory (`cd frontend`). Create a `.env.local` file if needed for frontend-specific environment variables, as described in `frontend/README.md`. A typical frontend `.env.local` might include:
+    -   **Frontend:** Navigate to the `frontend` directory (`cd frontend`). Create a `.env.local` file if needed for frontend-specific environment variables, as described in `frontend/README.md`. A typical frontend `frontend/.env.local` might include:
         ```
         NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api
         ```
@@ -39,7 +40,7 @@ This project has been restructured into a separate frontend (Next.js) and backen
         ```bash
         npm run dev
         ```
-        - The backend server will typically run on `http://localhost:3001`.
+        - The backend server (API) will typically run on `http://localhost:3001`.
         - The Next.js frontend development server will typically run on `http://localhost:9002`.
 
     *   **Individually (from the root directory):**

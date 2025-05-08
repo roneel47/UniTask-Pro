@@ -4,15 +4,17 @@ This is the Node.js/Express backend for UniTask Pro.
 
 ## Getting Started
 
-1.  Install dependencies:
+1.  Install dependencies (if not already installed from the root):
     ```bash
     npm install
     ```
-2.  Create a `.env` file in this directory. You can copy `.env.example` if provided:
+2.  Create a `.env` file in this directory (`backend/.env`) with the following content:
     ```
     PORT=3001
-    # Add other environment variables like database connection strings, API keys, etc.
-    # GOOGLE_API_KEY=your_google_api_key_for_genkit 
+    MONGODB_URI=your_mongodb_connection_string 
+    # e.g., MONGODB_URI=mongodb://localhost:27017/unitaskpro
+    # GOOGLE_API_KEY=your_google_api_key_for_genkit (if using Genkit features)
+    # Add other environment variables as needed
     ```
 3.  Build the TypeScript code:
     ```bash
@@ -47,5 +49,5 @@ This is the Node.js/Express backend for UniTask Pro.
 
 ## Data Storage
 
-User and task data is currently stored in JSON files in the `src/data` directory. This is for demonstration purposes and should be replaced with a proper database in a production environment.
-Data files (`users.json`, `tasks.json`, `taskAssignmentsMeta.json`) will be created automatically if they don't exist when the server starts or when data is first written.
+User and task data is stored in a MongoDB database. Ensure your `MONGODB_URI` environment variable is correctly configured.
+The application uses Mongoose models defined in `src/models` to interact with the database.
