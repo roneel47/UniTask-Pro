@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///home/user/studio/src/app/page.tsx"],"sourcesContent":["\"use client\";\n\nimport { useEffect } from 'react';\nimport { useRouter } from 'next/navigation';\nimport { useAuth } from '@/hooks/use-auth';\n\nexport default function HomePage() {\n  const { isAuthenticated, isLoading } = useAuth();\n  const router = useRouter();\n\n  useEffect(() => {\n    if (!isLoading) {\n      if (isAuthenticated) {\n        router.replace('/dashboard');\n      } else {\n        router.replace('/login');\n      }\n    }\n  }, [isAuthenticated, isLoading, router]);\n\n  return (\n    <div className=\"flex min-h-screen items-center justify-center bg-background\">\n      <div className=\"h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent\"></div>\n    </div>\n  );\n}"],"names":[],"mappings":";;;;AAEA;AACA;AACA;AAAA;AAJA;;;;;AAMe,SAAS;IACtB,MAAM,EAAE,eAAe,EAAE,SAAS,EAAE,GAAG,CAAA,GAAA,mIAAA,CAAA,UAAO,AAAD;IAC7C,MAAM,SAAS,CAAA,GAAA,kIAAA,CAAA,YAAS,AAAD;IAEvB,CAAA,GAAA,qMAAA,CAAA,YAAS,AAAD,EAAE;QACR,IAAI,CAAC,WAAW;YACd,IAAI,iBAAiB;gBACnB,OAAO,OAAO,CAAC;YACjB,OAAO;gBACL,OAAO,OAAO,CAAC;YACjB;QACF;IACF,GAAG;QAAC;QAAiB;QAAW;KAAO;IAEvC,qBACE,8OAAC;QAAI,WAAU;kBACb,cAAA,8OAAC;YAAI,WAAU;;;;;;;;;;;AAGrB","debugId":null}}]
+}
